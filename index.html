@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD현대사이트솔루션 산업차량 VPD Virtual Product Development</title>
+
+<!-- 나눔고딕 웹폰트 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@300;400;700;800&display=swap" rel="stylesheet">
+
+<style>
+  /* ==============================
+     CSS CUSTOM PROPERTIES (HD Hyundai CI 기반)
+     ============================== */
+  :root {
+    --hd-discovery-blue:  #003087;  /* Pantone 287C — 메인 딥블루 */
+    --hd-trust-blue:       #002554;  /* Pantone 655C — 다크블루 */
+    --hd-heritage-green:   #00AD1D;  /* Pantone 354C — 액센트 그린 */
+    --hd-eco-green:        #00E600;  /* Pantone 802C — 하이라이트 그린 */
+    --hd-prosperity-green: #008233;  /* Pantone 348C — 보조 그린 */
+    --hd-white:            #FFFFFF;
+    --hd-off-white:        #F4F7FA;
+    --hd-light-gray:       #E6ECF2;
+    --hd-mid-gray:         #94A3B8;
+    --hd-dark-gray:        #4A5568;
+    --hd-near-black:       #1A1F2E;
+    --hd-text-main:        #1E293B;
+
+    /* 글자 스케일 */
+    --f-sm:   0.875rem;
+    --f-base: 1rem;
+    --f-md:   1.125rem;
+    --f-lg:   1.375rem;
+    --f-xl:   1.75rem;
+    --f-2xl:  2.25rem;
+    --f-3xl:  3rem;
+    --f-hero: 3.75rem;
+
+    --font: 'Nanum Gothic', 'Noto Sans KR', sans-serif;
+    --max-w: 1200px;
+    --nav-h:  72px;
+  }
+
+  /* ==============================
+     RESET & BASE
+     ============================== */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: var(--nav-h);
+  }
+
+  body {
+    font-family: var(--font);
+    color: var(--hd-text-main);
+    background: var(--hd-white);
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  img { max-width: 100%; display: block; }
+  a   { color: inherit; text-decoration: none; }
+
+  /* ==============================
+     UTILITY CLASSES
+     ============================== */
+  .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 2rem; }
+
+  .section-tag {
+    display: inline-block;
+    font-size: var(--f-sm);
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-size: var(--f-2xl);
+    font-weight: 800;
+    color: var(--hd-trust-blue);
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    font-size: var(--f-md);
+    color: var(--hd-mid-gray);
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .accent-line {
+    display: inline-block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--hd-heritage-green), var(--hd-eco-green));
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--hd-light-gray), transparent);
+    margin: 0;
+  }
+
+  /* ==============================
+     PRELOADER
+     ============================== */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--hd-trust-blue);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  .preloader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  .preloader-mark {
+    width: 90px;
+    height: 90px;
+    position: relative;
+    animation: preloaderPulse 1.4s ease-in-out infinite;
+  }
+  .preloader-mark::before,
+  .preloader-mark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .preloader-mark::before {
+    background: var(--hd-heritage-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    animation: preloaderSpin 2s linear infinite;
+  }
+  .preloader-mark::after {
+    background: var(--hd-eco-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    animation: preloaderSpin 2s linear infinite reverse;
+    opacity: 0.5;
+  }
+  .preloader-logo {
+    color: var(--hd-white);
+    font-size: var(--f-lg);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    margin-top: 1.5rem;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.5s forwards;
+  }
+  .preloader-bar {
+    width: 200px;
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin-top: 1.2rem;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease 0.7s forwards;
+  }
+  .preloader-bar-fill {
+    height: 100%;
+    background: var(--hd-eco-green);
+    border-radius: 2px;
+    width: 0%;
+    animation: preloaderFill 1.8s ease-in-out 0.9s forwards;
+  }
+
+  @keyframes preloaderSpin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes preloaderPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.08); opacity: 0.85; }
+  }
+  @keyframes preloaderFill {
+    0%   { width: 0%; }
+    60%  { width: 70%; }
+    100% { width: 100%; }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==============================
+     NAVIGATION (책갈피)
+     ============================== */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    transition: background 0.35s ease, box-shadow 0.35s ease, padding 0.35s ease;
+    padding: 0 2rem;
+  }
+  .nav.is-scrolled {
+    background: rgba(10, 20, 40, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: var(--max-w);
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* 로고 영역 */
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-shrink: 0;
+  }
+  .nav-logo-icon {
+    width: 38px;
+    height: 38px;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .nav-logo-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--hd-heritage-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
+  .nav-logo-icon::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: var(--hd-eco-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    opacity: 0.7;
+  }
+  .nav-logo-text {
+    font-size: var(--f-md);
+    font-weight: 800;
+    color: var(--hd-white);
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+  .nav-logo-text small {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: var(--hd-mid-gray);
+    letter-spacing: 0.12em;
+    margin-top: 1px;
+  }
+
+  /* 네비게이션 링크 */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+  }
+  .nav-links a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    border-radius: 6px;
+    transition: color 0.25s ease, background 0.25s ease;
+    letter-spacing: 0.02em;
+  }
+  .nav-links a:hover {
+    color: var(--hd-white);
+    background: rgba(255,255,255,0.08);
+  }
+  .nav-links a.active {
+    color: var(--hd-white);
+    background: rgba(0,173,29,0.2);
+  }
+  .nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 2px;
+    background: var(--hd-eco-green);
+    border-radius: 1px;
+  }
+
+  /* 모바일 햄버거 */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--hd-white);
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform-origin: center;
+  }
+  .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .nav-mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    width: 100%;
+    background: rgba(10,20,40,0.97);
+    backdrop-filter: blur(12px);
+    padding: 1rem 2rem 2rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 999;
+  }
+  .nav-mobile-menu.open { display: flex; }
+  .nav-mobile-menu a {
+    display: block;
+    padding: 0.85rem 1rem;
+    font-size: var(--f-md);
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+  .nav-mobile-menu a:hover,
+  .nav-mobile-menu a.active {
+    color: var(--hd-white);
+    padding-left: 1.5rem;
+  }
+
+  /* ==============================
+     HERO SECTION
+     ============================== */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,173,29,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 70% 80%, rgba(0,48,135,0.12) 0%, transparent 60%),
+      linear-gradient(160deg, var(--hd-near-black) 0%, #0d1520 50%, var(--hd-trust-blue) 100%);
+    overflow: hidden;
+    padding: var(--nav-h) 2rem 4rem;
+  }
+
+  /* 히어로 배경 기하학 장식 */
+  .hero-bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero-bg-shape.s1 {
+    width: 600px; height: 600px;
+    top: -200px; right: -150px;
+    background: radial-gradient(circle, rgba(0,173,29,0.08) 0%, transparent 70%);
+  }
+  .hero-bg-shape.s2 {
+    width: 400px; height: 400px;
+    bottom: -100px; left: -100px;
+    background: radial-gradient(circle, rgba(0,230,0,0.06) 0%, transparent 70%);
+    animation: heroShapeFloat 12s ease-in-out infinite alternate;
+  }
+  .hero-bg-shape.s3 {
+    width: 300px; height: 300px;
+    top: 40%; right: 20%;
+    background: radial-gradient(circle, rgba(0,48,135,0.15) 0%, transparent 70%);
+    animation: heroShapeFloat 16s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes heroShapeFloat {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -30px) scale(1.05); }
+  }
+
+  /* 포워드 마크 대형 장식 */
+  .hero-forward-mark {
+    position: absolute;
+    right: -5%;
+    top: 10%;
+    width: 55vw;
+    height: 55vw;
+    max-width: 700px;
+    max-height: 700px;
+    opacity: 0.04;
+    pointer-events: none;
+  }
+  .hero-forward-mark svg { width: 100%; height: 100%; }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: heroContentIn 1s ease 0.3s both;
+  }
+  @keyframes heroContentIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 상단 배지 */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,173,29,0.15);
+    border: 1px solid rgba(0,173,29,0.35);
+    border-radius: 24px;
+    padding: 0.4rem 1rem 0.4rem 0.75rem;
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-eco-green);
+    letter-spacing: 0.05em;
+    animation: badgeGlow 3s ease-in-out infinite;
+  }
+  .hero-badge-dot {
+    width: 8px; height: 8px;
+    background: var(--hd-eco-green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--hd-eco-green);
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes badgeGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0,173,29,0); }
+    50%      { box-shadow: 0 0 16px 2px rgba(0,173,29,0.2); }
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  .hero-tag {
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-mid-gray);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-title {
+    font-size: clamp(var(--f-3xl), 7vw, var(--f-hero));
+    font-weight: 800;
+    color: var(--hd-white);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--hd-heritage-green), var(--hd-eco-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-title .blue {
+    background: linear-gradient(135deg, #5B9CFF, var(--hd-discovery-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: var(--f-md);
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    max-width: 580px;
+    margin-top: 0.5rem;
+  }
+
+  /* 히어로 액션 버튼 */
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    border-radius: 8px;
+    font-size: var(--f-base);
+    font-weight: 700;
+    font-family: var(--font);
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--hd-heritage-green), var(--hd-eco-green));
+    color: var(--hd-near-black);
+    box-shadow: 0 4px 18px rgba(0,173,29,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,173,29,0.45);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--hd-white);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(4px);
+  }
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.14);
+    transform: translateY(-2px);
+  }
+
+  /* 히어로 스크롤 유도 */
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: scrollHintBounce 2.4s ease-in-out infinite;
+  }
+  .hero-scroll-hint .arrow {
+    width: 20px; height: 20px;
+    border-right: 2px solid rgba(255,255,255,0.3);
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    transform: rotate(45deg);
+    opacity: 0.5;
+  }
+  @keyframes scrollHintBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* 히어로 하단 키 포인트 */
+  .hero-metrics {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    animation: heroContentIn 1s ease 0.7s both;
+  }
+  .hero-metric {
+    padding: 1.25rem 1.5rem;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+  }
+  .hero-metric:last-child { border-right: none; }
+  .hero-metric-num {
+    font-size: var(--f-xl);
+    font-weight: 800;
+    color: var(--hd-eco-green);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .hero-metric-label {
+    font-size: var(--f-sm);
+    color: rgba(255,255,255,0.5);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+  .hero-metric-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--hd-white);
+    background: rgba(0,173,29,0.2);
+    border-radius: 3px;
+    padding: 0.1rem 0.4rem;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.08em;
+  }
+
+  /* ==============================
+     SECTION 공통
+     ============================== */
+  section { padding: 6rem 0; }
+
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-heritage-green);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 28px; height: 2px;
+    background: var(--hd-heritage-green);
+  }
+
+  /* ==============================
+     SECTION 1 — 개요 (Overview)
+     ============================== */
+  .overview {
+    background: var(--hd-white);
+    position: relative;
+  }
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-top: 2.5rem;
+  }
+  .overview-text p {
+    font-size: var(--f-md);
+    color: var(--hd-dark-gray);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+  .overview-text p strong {
+    color: var(--hd-trust-blue);
+    font-weight: 700;
+  }
+  .overview-text .lead {
+    font-size: var(--f-lg);
+    color: var(--hd-trust-blue);
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+  .overview-list {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .overview-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: var(--f-base);
+    color: var(--hd-dark-gray);
+  }
+  .overview-list li::before {
+    content: '✓';
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: rgba(0,173,29,0.12);
+    color: var(--hd-heritage-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-top: 2px;
+  }
+
+  /* 개요 시각 블록 (도형 + 아이콘) */
+  .overview-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    background: var(--hd-off-white);
+    border: 1px solid var(--hd-light-gray);
+    border-radius: 16px;
+    min-height: 380px;
+    overflow: hidden;
+  }
+  .ov-shape {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .ov-shape.s1 {
+    width: 220px; height: 220px;
+    top: -40px; right: -60px;
+    background: radial-gradient(circle, rgba(0,173,29,0.12) 0%, transparent 70%);
+  }
+  .ov-shape.s2 {
+    width: 140px; height: 140px;
+    bottom: -30px; left: -40px;
+    background: radial-gradient(circle, rgba(0,48,135,0.10) 0%, transparent 70%);
+  }
+  /* 디지털 트윈 추상 다이어그램 */
+  .dt-diagram {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 360px;
+  }
+  .dt-diagram .dt-title {
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-mid-gray);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .dt-nodes {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+  }
+  .dt-node {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 1rem 0.5rem;
+    background: var(--hd-white);
+    border: 1px solid var(--hd-light-gray);
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: default;
+  }
+  .dt-node:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,48,135,0.12);
+    border-color: var(--hd-heritage-green);
+  }
+  .dt-node-icon {
+    width: 44px; height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1.3rem;
+  }
+  .dt-node:nth-child(1) .dt-node-icon { background: rgba(0,173,29,0.12); }
+  .dt-node:nth-child(2) .dt-node-icon { background: rgba(0,48,135,0.10); }
+  .dt-node:nth-child(3) .dt-node-icon { background: rgba(0,230,0,0.12); }
+  .dt-node-label {
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-trust-blue);
+  }
+  .dt-node-desc {
+    font-size: 0.7rem;
+    color: var(--hd-mid-gray);
+    text-align: center;
+  }
+  .dt-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--hd-heritage-green);
+    font-size: 1.2rem;
+    font-weight: 300;
+  }
+  .dt-flow-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--hd-eco-green);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  /* ==============================
+     SECTION 2 — VPD란 (Concept Cards)
+     ============================== */
+  .vpd-concept {
+    background: var(--hd-off-white);
+    position: relative;
+  }
+  .vpd-concept::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--hd-heritage-green), transparent);
+  }
+  .vpd-intro {
+    max-width: 680px;
+    margin-bottom: 3rem;
+  }
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+  .concept-card {
+    background: var(--hd-white);
+    border: 1px solid var(--hd-light-gray);
+    border-radius: 14px;
+    padding: 2rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--hd-heritage-green), var(--hd-eco-green));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .concept-card:hover::before { transform: scaleX(1); }
+  .concept-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,48,135,0.10);
+    border-color: rgba(0,173,29,0.25);
+  }
+  .concept-card-num {
+    font-size: var(--f-2xl);
+    font-weight: 800;
+    color: var(--hd-light-gray);
+    line-height: 1;
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
+  }
+  .concept-card:hover .concept-card-num { color: var(--hd-heritage-green); }
+  .concept-card-icon {
+    width: 52px; height: 52px;
+    background: var(--hd-off-white);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--hd-light-gray);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  .concept-card:hover .concept-card-icon {
+    background: rgba(0,173,29,0.10);
+    border-color: rgba(0,173,29,0.3);
+  }
+  .concept-card-title {
+    font-size: var(--f-lg);
+    font-weight: 800;
+    color: var(--hd-trust-blue);
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+  .concept-card-desc {
+    font-size: var(--f-sm);
+    color: var(--hd-dark-gray);
+    line-height: 1.65;
+  }
+  .concept-card-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--hd-heritage-green);
+    letter-spacing: 0.06em;
+    border: 1px solid rgba(0,173,29,0.2);
+    border-radius: 3px;
+    padding: 0.1rem 0.5rem;
+    background: rgba(0,173,29,0.04);
+  }
+
+  /* ==============================
+     SECTION 3 — 주요업무 (Major Tasks)
+     ============================== */
+  .major-tasks {
+    background: var(--hd-white);
+  }
+  .tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .task-card {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--hd-light-gray);
+    background: var(--hd-white);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    position: relative;
+  }
+  .task-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,48,135,0.10);
+  }
+  .task-card-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+  .task-card-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+  .task-card:nth-child(1) .task-card-icon { background: rgba(0,48,135,0.10); }
+  .task-card:nth-child(2) .task-card-icon { background: rgba(0,173,29,0.12); }
+  .task-card:nth-child(3) .task-card-icon { background: rgba(0,130,51,0.10); }
+  .task-card:nth-child(4) .task-card-icon { background: rgba(0,230,0,0.10); }
+  .task-card:nth-child(5) .task-card-icon { background: rgba(0,48,135,0.08); }
+  .task-card:nth-child(6) .task-card-icon { background: rgba(0,173,29,0.08); }
+  .task-card-title {
+    font-size: var(--f-lg);
+    font-weight: 800;
+    color: var(--hd-trust-blue);
+  }
+  .task-card-body {
+    padding: 0 1.5rem 1.5rem;
+  }
+  .task-card-body p {
+    font-size: var(--f-sm);
+    color: var(--hd-dark-gray);
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+  }
+  .task-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .task-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--hd-dark-gray);
+    background: var(--hd-off-white);
+    border: 1px solid var(--hd-light-gray);
+    border-radius: 3px;
+    padding: 0.15rem 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ==============================
+     SECTION 4 — 프로세스 (Process Flow)
+     ============================== */
+  .process {
+    background: var(--hd-trust-blue);
+    position: relative;
+    overflow: hidden;
+  }
+  .process::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 80% at 20% 50%, rgba(0,173,29,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 80% 30%, rgba(0,230,0,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .process-inner { position: relative; z-index: 1; }
+
+  .process-head { text-align: center; margin-bottom: 3.5rem; }
+  .process-head .section-title { color: var(--hd-white); }
+  .process-head .section-sub { color: rgba(255,255,255,0.5); }
+
+  /* 수평 프로세스 플로우 */
+  .process-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    padding: 1.75rem 0;
+    position: relative;
+  }
+  .process-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 80px;
+    top: 50%;
+    width: calc(100% - 80px - 5px);
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0,173,29,0.4), rgba(0,230,0,0.1));
+    transform: translateY(-50%);
+  }
+  .process-step-num {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--hd-heritage-green), var(--hd-eco-green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--f-xl);
+    font-weight: 800;
+    color: var(--hd-near-black);
+    box-shadow: 0 4px 14px rgba(0,173,29,0.35);
+    position: relative;
+    z-index: 2;
+  }
+  .process-step-content {
+    flex: 1;
+    padding-top: 0.4rem;
+  }
+  .process-step-title {
+    font-size: var(--f-xl);
+    font-weight: 800;
+    color: var(--hd-white);
+    margin-bottom: 0.5rem;
+  }
+  .process-step-desc {
+    font-size: var(--f-base);
+    color: rgba(255,255,255,0.55);
+    line-height: 1.65;
+    max-width: 560px;
+  }
+  .process-step-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+  .process-tech-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--hd-eco-green);
+    background: rgba(0,173,29,0.14);
+    border: 1px solid rgba(0,173,29,0.25);
+    border-radius: 3px;
+    padding: 0.15rem 0.55rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ==============================
+     SECTION 5 — 경쟁력 (Strengths)
+     ============================== */
+  .strength {
+    background: var(--hd-white);
+    position: relative;
+  }
+  .strength-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+  .strength-card {
+    border-radius: 14px;
+    padding: 2rem;
+    background: var(--hd-off-white);
+    border: 1px solid var(--hd-light-gray);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .strength-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 28px rgba(0,48,135,0.10);
+  }
+  .strength-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(0,173,29,0.08) 0%, transparent 70%);
+    border-radius: 0 0 0 50%;
+    pointer-events: none;
+  }
+  .strength-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: rgba(0,173,29,0.08);
+    border: 1px solid rgba(0,173,29,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.3rem;
+    transition: background 0.3s ease;
+  }
+  .strength-card:hover .strength-icon {
+    background: rgba(0,173,29,0.14);
+  }
+  .strength-title {
+    font-size: var(--f-lg);
+    font-weight: 800;
+    color: var(--hd-trust-blue);
+    margin-bottom: 0.6rem;
+    line-height: 1.3;
+  }
+  .strength-desc {
+    font-size: var(--f-sm);
+    color: var(--hd-dark-gray);
+    line-height: 1.65;
+  }
+
+  /* 통계 하이라이트 바 */
+  .strength-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--hd-light-gray);
+    border: 1px solid var(--hd-light-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 2.5rem;
+  }
+  .strength-stat {
+    background: var(--hd-white);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+  .strength-stat:hover { background: var(--hd-off-white); }
+  .strength-stat-num {
+    font-size: var(--f-2xl);
+    font-weight: 800;
+    color: var(--hd-heritage-green);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .strength-stat-label {
+    font-size: var(--f-sm);
+    color: var(--hd-mid-gray);
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  /* ==============================
+     SECTION 6 — 문의 (CTA)
+     ============================== */
+  .cta {
+    background: var(--hd-off-white);
+    position: relative;
+  }
+  .cta-inner {
+    background: linear-gradient(135deg, var(--hd-trust-blue) 0%, var(--hd-discovery-blue) 100%);
+    border-radius: 20px;
+    padding: 3.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-inner::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,173,29,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cta-inner::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(0,230,0,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cta-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+  .cta-label {
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-eco-green);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .cta-title {
+    font-size: var(--f-2xl);
+    font-weight: 800;
+    color: var(--hd-white);
+    line-height: 1.3;
+  }
+  .cta-desc {
+    font-size: var(--f-md);
+    color: rgba(255,255,255,0.6);
+    line-height: 1.65;
+    max-width: 520px;
+  }
+  .cta-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  .cta-contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .cta-contact-item {
+    padding: 1.25rem 1.5rem;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+  }
+  .cta-contact-item:last-child { border-right: none; }
+  .cta-contact-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+  .cta-contact-value {
+    font-size: var(--f-base);
+    font-weight: 700;
+    color: var(--hd-white);
+  }
+
+  /* ==============================
+     FOOTER
+     ============================== */
+  .footer {
+    background: var(--hd-near-black);
+    padding: 2.5rem 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .footer-brand-mark {
+    width: 28px; height: 28px;
+    position: relative;
+  }
+  .footer-brand-mark::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--hd-heritage-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
+  .footer-brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--hd-eco-green);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    opacity: 0.6;
+  }
+  .footer-brand-text {
+    font-size: var(--f-sm);
+    font-weight: 700;
+    color: var(--hd-white);
+    line-height: 1.2;
+  }
+  .footer-brand-text small {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 400;
+    color: var(--hd-mid-gray);
+    letter-spacing: 0.1em;
+  }
+  .footer-link-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    list-style: none;
+  }
+  .footer-link-list a {
+    font-size: var(--f-sm);
+    color: rgba(255,255,255,0.4);
+    transition: color 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+  .footer-link-list a:hover { color: var(--hd-eco-green); }
+  .footer-copy {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    width: 100%;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 1.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ==============================
+     SCROLL REVEAL ANIMATIONS
+     ============================== */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ==============================
+     RESPONSIVE
+     ============================== */
+  @media (max-width: 1024px) {
+    .overview-grid    { grid-template-columns: 1fr; gap: 2.5rem; }
+    .concept-grid     { grid-template-columns: repeat(2, 1fr); }
+    .tasks-grid       { grid-template-columns: repeat(2, 1fr); }
+    .strength-grid    { grid-template-columns: repeat(2, 1fr); }
+    .strength-stats   { grid-template-columns: repeat(2, 1fr); }
+    .hero-metrics     { grid-template-columns: repeat(2, 1fr); }
+    .hero-metric:nth-child(2) { border-right: none; }
+    .hero-metric:nth-child(1) { border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .hero-metric:nth-child(2) { border-bottom: 1px solid rgba(255,255,255,0.06); }
+  }
+
+  @media (max-width: 768px) {
+    :root { --nav-h: 60px; }
+
+    .nav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+
+    .hero-forward-mark { display: none; }
+    .hero { padding: var(--nav-h) 1.25rem 3rem; }
+    .hero-metrics { grid-template-columns: 1fr 1fr; }
+    .hero-metric { padding: 1rem 0.75rem; }
+    .hero-metric-num { font-size: var(--f-xl); }
+    .hero-title { font-size: var(--f-3xl); }
+
+    section { padding: 4rem 0; }
+    .wrap   { padding: 0 1.25rem; }
+
+    .concept-grid  { grid-template-columns: 1fr; }
+    .tasks-grid    { grid-template-columns: 1fr; }
+    .strength-grid { grid-template-columns: 1fr; }
+    .strength-stats { grid-template-columns: 1fr 1fr; }
+    .cta-inner     { padding: 2rem; border-radius: 14px; }
+    .cta-contact-grid { grid-template-columns: 1fr; }
+    .cta-contact-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .cta-contact-item:last-child { border-bottom: none; }
+
+    .process-step { gap: 1.25rem; padding: 1.25rem 0; }
+    .process-step-num { width: 44px; height: 44px; font-size: var(--f-lg); }
+    .process-step:not(:last-child)::after { display: none; }
+    .process-step::before {
+      content: '';
+      position: absolute;
+      left: 54px;
+      top: 50%;
+      width: 2px;
+      height: calc(100% - 50%);
+      background: linear-gradient(to bottom, rgba(0,173,29,0.4), rgba(0,230,0,0.1));
+      transform: translateY(-50%);
+    }
+
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-link-list { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ PRELOADER ============ -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader-mark"></div>
+  <div class="preloader-logo">HD현대사이트솔루션</div>
+  <div class="preloader-bar"><div class="preloader-bar-fill"></div></div>
+</div>
+
+<!-- ============ NAVIGATION ============ -->
+<nav class="nav" id="nav" role="navigation" aria-label="메인 내비게이션">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo" aria-label="HD현대사이트솔루션 홈">
+      <div class="nav-logo-icon" aria-hidden="true"></div>
+      <div class="nav-logo-text">
+        HD현대사이트솔루션
+        <small>산업차량 VPD</small>
+      </div>
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#overview"      data-section="overview">개요</a></li>
+      <li><a href="#vpd-concept"   data-section="vpd-concept">VPD란</a></li>
+      <li><a href="#major-tasks"    data-section="major-tasks">주요업무</a></li>
+      <li><a href="#process"        data-section="process">프로세스</a></li>
+      <li><a href="#strength"       data-section="strength">경쟁력</a></li>
+      <li><a href="#cta"            data-section="cta">문의</a></li>
+    </ul>
+
+    <button class="nav-hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- 모바일 메뉴 -->
+<div class="nav-mobile-menu" id="mobileMenu" role="menu">
+  <a href="#overview"      data-section="overview">개요</a>
+  <a href="#vpd-concept"   data-section="vpd-concept">VPD란</a>
+  <a href="#major-tasks"    data-section="major-tasks">주요업무</a>
+  <a href="#process"        data-section="process">프로세스</a>
+  <a href="#strength"       data-section="strength">경쟁력</a>
+  <a href="#cta"            data-section="cta">문의</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-bg-shape s1" aria-hidden="true"></div>
+  <div class="hero-bg-shape s2" aria-hidden="true"></div>
+  <div class="hero-bg-shape s3" aria-hidden="true"></div>
+
+  <!-- Forward Mark 대형 장식 SVG -->
+  <div class="hero-forward-mark" aria-hidden="true">
+    <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="200,40 380,320 200,320" fill="#00AD1D" opacity="0.5"/>
+      <polygon points="200,80 340,320 200,320" fill="#00E600" opacity="0.4"/>
+      <polygon points="200,120 300,320 200,320" fill="#003087" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span class="hero-badge-dot" aria-hidden="true"></span>
+      VIRTUAL PRODUCT DEVELOPMENT
+    </div>
+
+    <div class="hero-tag">HD HYUNDAI XITESOLUTION · 산업차량개발부문</div>
+
+    <h1 class="hero-title">
+      가상공간에서<br>
+      <span class="highlight">완성도를 검증</span>하고<br>
+      <span class="blue">실물을 앞서가는</span><br>
+      제품 개발
+    </h1>
+
+    <p class="hero-desc">
+      HD현대사이트솔루션 산업차량 VPD 파트
+      — 디지털 트윈, CAE 해석, 가상 검증을 통합해
+      시제품 제작 전부터 제품 성능을 완성하는 가상제품개발(Virtual Product Development) 조직입니다.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#vpd-concept" class="btn btn-primary">
+        VPD 소개 자세히 보기
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#process" class="btn btn-secondary">
+        개발 프로세스
+      </a>
+    </div>
+  </div>
+
+  <!-- 히어로 수치 영역 -->
+  <div class="hero-metrics" role="list">
+    <div class="hero-metric" role="listitem">
+      <div class="hero-metric-tag">플랫폼</div>
+      <div class="hero-metric-num" data-count="3">0</div>
+      <div class="hero-metric-label">글로벌 제품 개발<br>관리 시스템 구축</div>
+    </div>
+    <div class="hero-metric" role="listitem">
+      <div class="hero-metric-tag">목표</div>
+      <div class="hero-metric-num" data-count="1.6">0</div>
+      <div class="hero-metric-label">2030년 산업차량<br>매출 1.6조 원</div>
+    </div>
+    <div class="hero-metric" role="listitem">
+      <div class="hero-metric-tag">생산</div>
+      <div class="hero-metric-num" data-count="24000">0</div>
+      <div class="hero-metric-label">연간 산업차량<br>생산 능력 (대)</div>
+    </div>
+    <div class="hero-metric" role="listitem">
+      <div class="hero-metric-tag">단축</div>
+      <div class="hero-metric-num" data-count="32">0</div>
+      <div class="hero-metric-label">제품 완성 기간<br>단축률 (%)</div>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <span>SCROLL</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ============ SECTION 1 — 개요 ============ -->
+<section class="overview" id="overview">
+  <div class="wrap">
+    <div class="section-eyebrow">Overview</div>
+    <div class="accent-line" aria-hidden="true"></div>
+    <h2 class="section-title">산업차량 VPD,<br>가상제품개발 파트란</h2>
+    <p class="section-sub" style="margin-bottom: 0.5rem;">
+      Hyundai XiteSolution Industrial Vehicle Division — Virtual Product Development
+    </p>
+
+    <div class="overview-grid">
+      <div class="overview-text reveal">
+        <p class="lead">
+          실물을 만들기 전에, 디지털 공간에서 먼저 완성도를 검증합니다.
+        </p>
+        <p>
+          HD현대사이트솔루션 <strong>산업차량개발부문 VPD 파트</strong>는
+          지게차·견인차·운반차 등 산업차량의 <strong>가상제품개발(Virtual Product Development)</strong>을
+          총괄하는 디지털 엔지니어링 조직입니다.
+        </p>
+        <p>
+          다쏘시스템의 <strong>3DEXPERIENCE 플랫폼</strong> 기반 글로벌 제품 개발 관리(GPDM) 시스템을
+          활용하여, 설계·해석·가상 검증·제조 준비까지 하나의 데이터 흐름으로 연결합니다.
+          이를 통해 <strong>개발 리드 타임 단축, 생산 오류 감소, 제품 품질 향상</strong>을 동시에 달성합니다.
+        </p>
+
+        <ul class="overview-list">
+          <li><strong>디지털 트윈(Digital Twin)</strong> 기반 가상제품개발 체계 운영</li>
+          <li><strong>CAE(Computer Aided Engineering)</strong> 해석 기반 설계 최적화</li>
+          <li><strong>DMU(Digital Mock-Up)</strong> — 3D 디지털 목업 검토 및 간섭 검증</li>
+          <li><strong>제품수명주기관리(PLM)</strong> 연동 — 설계부터 생산 준비까지 데이터 일관성 확보</li>
+          <li><strong>제조운영관리(MOM)</strong> — 울산·군산 생산시설과 실시간 데이터 연동</li>
+        </ul>
+      </div>
+
+      <div class="overview-visual reveal reveal-delay-2">
+        <div class="ov-shape s1" aria-hidden="true"></div>
+        <div class="ov-shape s2" aria-hidden="true"></div>
+        <div class="dt-diagram">
+          <div class="dt-title">VPD 디지털 개발 흐름</div>
+          <div class="dt-nodes">
+            <div class="dt-node">
+              <div class="dt-node-icon" aria-hidden="true">📐</div>
+              <div class="dt-node-label">3D 설계</div>
+              <div class="dt-node-desc">CAD · DMU</div>
+            </div>
+            <div class="dt-arrow" aria-hidden="true">→</div>
+            <div class="dt-node">
+              <div class="dt-node-icon" aria-hidden="true">⚙️</div>
+              <div class="dt-node-label">CAE 해석</div>
+              <div class="dt-node-desc">구조 · 유동 · 동역학</div>
+            </div>
+            <div class="dt-arrow" aria-hidden="true">→</div>
+            <div class="dt-node">
+              <div class="dt-node-icon" aria-hidden="true">🖥️</div>
+              <div class="dt-node-label">가상 검증</div>
+              <div class="dt-node-desc">Digital Twin · Co-Sim</div>
+            </div>
+          </div>
+          <div class="dt-flow-label">→ 생산 준비 · 실물 검증 → 양산</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ============ SECTION 2 — VPD란 ============ -->
+<section class="vpd-concept" id="vpd-concept">
+  <div class="wrap">
+    <div class="vpd-intro reveal">
+      <div class="section-eyebrow">What is VPD</div>
+      <div class="accent-line" aria-hidden="true"></div>
+      <h2 class="section-title">VPD — 가상제품개발의<br>4가지 핵심 개념</h2>
+      <p class="section-sub">
+        실물 시제품 제작 전에 디지털 공간에서 설계·해석·검증을 반복하며
+        제품 완성도를 높이는 개발 방법론입니다. 산업차량 개발의 모든 단계에서 적용됩니다.
+      </p>
+    </div>
+
+    <div class="concept-grid">
+      <article class="concept-card reveal reveal-delay-1">
+        <div class="concept-card-num">01</div>
+        <div class="concept-card-icon" aria-hidden="true">🧬</div>
+        <h3 class="concept-card-title">디지털 트윈<br>(Digital Twin)</h3>
+        <p class="concept-card-desc">
+          현실 산업차량의 구조·운동·유압 특성을 가상공간에 동일하게 재현한
+          디지털 모델입니다. 실제 센서 데이터까지 연동해 성능을 예측하고 최적화합니다.
+        </p>
+        <div class="concept-card-tag">Digital Shadow → Digital Twin</div>
+      </article>
+
+      <article class="concept-card reveal reveal-delay-2">
+        <div class="concept-card-num">02</div>
+        <div class="concept-card-icon" aria-hidden="true">📊</div>
+        <h3 class="concept-card-title">CAE 해석<br>(Computer Aided<br>Engineering)</h3>
+        <p class="concept-card-desc">
+          구조 강도, 유체 유동, 진동·소음(NVH), 열, 내구 수명 등
+          제품의 물리적 성능을 컴퓨터 시뮬레이션으로 사전 예측·평가합니다.
+          1D-3D 연성해석(Co-Simulation)도 활용됩니다.
+        </p>
+        <div class="concept-card-tag">구조 · 유동 · 동역학 · 열</div>
+      </article>
+
+      <article class="concept-card reveal reveal-delay-3">
+        <div class="concept-card-num">03</div>
+        <div class="concept-card-icon" aria-hidden="true">🖼️</div>
+        <h3 class="concept-card-title">디지털 목업<br>(DMU · Digital<br>Mock-Up)</h3>
+        <p class="concept-card-desc">
+          3D CAD 데이터로 완성된 가상 조립 모델입니다.
+          부품 간 간섭 여부, 조립성, 설치 공간, 유지보수 접근성까지
+          실물 제작 전에 디지털 환경에서 검토합니다.
+        </p>
+        <div class="concept-card-tag">간섭 검사 · 조립성 · 패키징</div>
+      </article>
+
+      <article class="concept-card reveal reveal-delay-4">
+        <div class="concept-card-num">04</div>
+        <div class="concept-card-icon" aria-hidden="true">🔗</div>
+        <h3 class="concept-card-title">PLM · GPDM<br>연동 체계</h3>
+        <p class="concept-card-desc">
+          다쏘시스템 3DEXPERIENCE 플랫폼의 ENOVIA(데이터 관리),
+          DELMIA(제조 운영 관리)를 활용하여 설계·부품·생산 정보를
+          하나의 플랫폼으로 통합합니다. 실시간 협업과 데이터 일관성이 핵심입니다.
+        </p>
+        <div class="concept-card-tag">ENOVIA · DELMIA · 3DEXPERIENCE</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ============ SECTION 3 — 주요업무 ============ -->
+<section class="major-tasks" id="major-tasks">
+  <div class="wrap">
+    <div class="section-eyebrow">Major Tasks</div>
+    <div class="accent-line" aria-hidden="true"></div>
+    <h2 class="section-title">산업차량 VPD 파트의<br>주요 업무 영역</h2>
+    <p class="section-sub">
+      지게차, 견인차, 운반차 등 산업차량 전 차종에 걸쳐
+      개념 설계부터 양산 준비까지 가상제품개발 방법론을 적용합니다.
+    </p>
+
+    <div class="tasks-grid">
+      <article class="task-card reveal reveal-delay-1">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">🚜</div>
+          <h3 class="task-card-title">차량 개념 설계<br>및 3D 모델링</h3>
+        </div>
+        <div class="task-card-body">
+          <p>산업차량의 기본 구조, 샤시 레이아웃, 동력계 배치, 운전 공간 설계 등을
+            3D CAD 환경에서 구축하고 디지털 목업(DMU)으로 초기 패키징을 검증합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">3D CAD</span>
+            <span class="task-tag">DMU</span>
+            <span class="task-tag">패키징 검토</span>
+            <span class="task-tag">개념 설계</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="task-card reveal reveal-delay-2">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">🔩</div>
+          <h3 class="task-card-title">CAE 구조·내구<br>해석 및 설계 반영</h3>
+        </div>
+        <div class="task-card-body">
+          <p>차체 구조 강도, 프레임 피로 수명, 주요 접합부 응력, 적재 하중 전달 경로 등을
+            CAE 기반으로 해석하고, 그 결과를 설계 변경에 직접 반영합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">구조 해석</span>
+            <span class="task-tag">피로 내구</span>
+            <span class="task-tag">FEM</span>
+            <span class="task-tag">설계 최적화</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="task-card reveal reveal-delay-3">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">🌊</div>
+          <h3 class="task-card-title">유압·유동<br>해석 및 회로 검토</h3>
+        </div>
+        <div class="task-card-body">
+          <p>MCV(Main Control Valve), 유압실린더, 유압 라인 등 컴포넌트 및 차량 유압 계통을
+            유동 해석(CFD)과 1D 모델 기반으로 검증하여 압손 저감과 응답성을 최적화합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">CFD</span>
+            <span class="task-tag">1D 유압 모델</span>
+            <span class="task-tag">MCV</span>
+            <span class="task-tag">압손 저감</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="task-card reveal reveal-delay-1">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">🏋️</div>
+          <h3 class="task-card-title">차량 동역학<br>가상 성능 평가</h3>
+        </div>
+        <div class="task-card-body">
+          <p>Forklift, tugger, 운반차 등 각 차종 특유의 작업 동작(리프트, 이동, 선회 등)을
+            가상 환경에서 재현하고 주행 안정성, 전복 안정성, 조향 성능 등을 평가합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">다물체 동역학</span>
+            <span class="task-tag">전복 안정성</span>
+            <span class="task-tag">가상 드라이빙</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="task-card reveal reveal-delay-2">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">⚡</div>
+          <h3 class="task-card-title">전동화 차량<br>가상 검증 지원</h3>
+        </div>
+        <div class="task-card-body">
+          <p>4~9톤 중형 전동지게차 및 10~18톤 대형 전동지게차 등 전동화 모델 개발 시
+            배터리 탑재 구조, 모터·감속기 배치, 중량 분배, 열 관리 등을 디지털 환경에서 사전 검증합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">전동화</span>
+            <span class="task-tag">배터리 패키징</span>
+            <span class="task-tag">중량 분배</span>
+            <span class="task-tag">열 관리</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="task-card reveal reveal-delay-3">
+        <div class="task-card-header">
+          <div class="task-card-icon" aria-hidden="true">🏭</div>
+          <h3 class="task-card-title">생산 준비<br>가상 시뮬레이션</h3>
+        </div>
+        <div class="task-card-body">
+          <p>DELMIA 기반 제조운영관리(MOM) 시뮬레이션으로 조립 순서, 공정 동선, 작업자 ergonomics,
+            생산 설비 배치 등을 사전에 검토하고 울산캠퍼스 생산 라인 최적화에 반영합니다.</p>
+          <div class="task-card-tags">
+            <span class="task-tag">DELMIA</span>
+            <span class="task-tag">조립 시뮬레이션</span>
+            <span class="task-tag">공정 최적화</span>
+            <span class="task-tag">Ergonomics</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ============ SECTION 4 — 프로세스 ============ -->
+<section class="process" id="process">
+  <div class="wrap process-inner">
+    <div class="process-head reveal">
+      <div class="section-eyebrow" style="color: var(--hd-eco-green);">Process</div>
+      <div class="accent-line" style="background: linear-gradient(90deg, var(--hd-eco-green), rgba(0,230,0,0.5));" aria-hidden="true"></div>
+      <h2 class="section-title" style="color: var(--hd-white);">산업차량 VPD<br>5단계 개발 프로세스</h2>
+      <p class="section-sub">
+        실물 제작 전, 가상공간에서 설계·해석·검증을 반복하며 완성도를 높이는 5단계 체계입니다.
+      </p>
+    </div>
+
+    <div class="process-flow">
+      <div class="process-step reveal">
+        <div class="process-step-num" aria-hidden="true">1</div>
+        <div class="process-step-content">
+          <h3 class="process-step-title">요구사항 정의 및 개념 설계</h3>
+          <p class="process-step-desc">
+            차량 사양서(VTS), 목표 성능, 적용 산업 현장 요구사항, 법규·안전 기준을 정리하고
+            차종별 컨셉과 기본 레이아웃을 3D CAD로 구체화합니다.
+          </p>
+          <div class="process-step-tech">
+            <span class="process-tech-tag">VTS 정의</span>
+            <span class="process-tech-tag">3D CAD · DMU</span>
+            <span class="process-tech-tag">레이아웃 설계</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-step reveal reveal-delay-1">
+        <div class="process-step-num" aria-hidden="true">2</div>
+        <div class="process-step-content">
+          <h3 class="process-step-title">상세 설계 및 디지털 목업(DMU) 구축</h3>
+          <p class="process-step-desc">
+            개별 부품·어셈블리 상세 설계와 동시에 전체 차량 3D 모델을 완성하고,
+            부품 간 간섭·조립성·설치 공간·유지보수 접근성을 DMU 환경에서 검증합니다.
+          </p>
+          <div class="process-step-tech">
+            <span class="process-tech-tag">상세 3D 설계</span>
+            <span class="process-tech-tag">DMU 간섭 검사</span>
+            <span class="process-tech-tag">조립성 검토</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-step reveal reveal-delay-2">
+        <div class="process-step-num" aria-hidden="true">3</div>
+        <div class="process-step-content">
+          <h3 class="process-step-title">CAE 기반 성능 해석 및 설계 최적화</h3>
+          <p class="process-step-desc">
+            구조 강도·내구, 유압 유동, 동역학, NVH, 열 등 다양한 물리 영역에서 CAE 해석을 수행합니다.
+            해석 결과를 설계 파라미터에 반영하여 목표 성능을 달성할 때까지 최적화를 반복합니다.
+          </p>
+          <div class="process-step-tech">
+            <span class="process-tech-tag">구조 · 내구 FEM</span>
+            <span class="process-tech-tag">CFD · 유압 해석</span>
+            <span class="process-tech-tag">Co-Simulation 1D-3D</span>
+            <span class="process-tech-tag">AI 최적설계</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-step reveal reveal-delay-3">
+        <div class="process-step-num" aria-hidden="true">4</div>
+        <div class="process-step-content">
+          <h3 class="process-step-title">디지털 트윈 기반 가상 검증</h3>
+          <p class="process-step-desc">
+            해석 모델과 DMU를 통합한 차량 수준 디지털 트윈으로 가상 주행·작업 시험을 수행합니다.
+            실물 프로토타입 제작 전에 성능Goal 충족 여부를 검증하고, 발견된 문제를 설계에 반영합니다.
+          </p>
+          <div class="process-step-tech">
+            <span class="process-tech-tag">Digital Twin</span>
+            <span class="process-tech-tag">가상 드라이빙 시험</span>
+            <span class="process-tech-tag">시스템 레벨 검증</span>
+            <span class="process-tech-tag">Real-time 연동</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="process-step reveal reveal-delay-4">
+        <div class="process-step-num" aria-hidden="true">5</div>
+        <div class="process-step-content">
+          <h3 class="process-step-title">생산 준비 · 실물 검증 및 피드백</h3>
+          <p class="process-step-desc">
+            DELMIA 제조 시뮬레이션으로 조립·공정 준비를 검증하고, 실물 시제품과 시험 결과를
+            디지털 모델과 비교하여 Digital Shadow를 정교화합니다. 이 데이터는 차기 개발의 자산이 됩니다.
+          </p>
+          <div class="process-step-tech">
+            <span class="process-tech-tag">DELMIA · MOM</span>
+            <span class="process-tech-tag">실물-가상 비교</span>
+            <span class="process-tech-tag">Digital Shadow 갱신</span>
+            <span class="process-tech-tag">PLM 데이터 연동</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ============ SECTION 5 — 경쟁력 ============ -->
+<section class="strength" id="strength">
+  <div class="wrap">
+    <div class="section-eyebrow">Strength & Advantage</div>
+    <div class="accent-line" aria-hidden="true"></div>
+    <h2 class="section-title">VPD가 만드는<br>산업차량 개발의 차별점</h2>
+    <p class="section-sub">
+      가상제품개발 방법론을 통해 실물 중심 개발의 한계를 넘어,
+      더 빠르게, 더 정확하게, 더 낮은 비용으로 제품을 완성합니다.
+    </p>
+
+    <div class="strength-grid">
+      <div class="strength-card reveal reveal-delay-1">
+        <div class="strength-icon" aria-hidden="true">⏱️</div>
+        <h3 class="strength-title">개발 리드 타임 단축</h3>
+        <p class="strength-desc">
+          CAE 선행 설계, DMU 동시 검토, 디지털 트윈 가상 검증을 통해
+          실물 시제품 반복 수를 줄이고 설계-검증 사이클을 크게 단축합니다.
+          울산캠퍼스 선진화 프로젝트로 제품 완성 기간이 기존 대비 약 <strong>32% 단축</strong>되었습니다.
+        </p>
+      </div>
+
+      <div class="strength-card reveal reveal-delay-2">
+        <div class="strength-icon" aria-hidden="true">🎯</div>
+        <h3 class="strength-title">설계 완성도와 품질 향상</h3>
+        <p class="strength-desc">
+          실물 제작 전에 구조 강도, 유압 성능, 동역학 거동, 조립성을 가상으로 검증하여
+          초기 단계에서 설계 오류를 제거합니다. 결과적으로 양산 단계의 품질 변동 폭이 줄어듭니다.
+        </p>
+      </div>
+
+      <div class="strength-card reveal reveal-delay-3">
+        <div class="strength-icon" aria-hidden="true">🌱</div>
+        <h3 class="strength-title">전동화·무인화 대응 개발 역량</h3>
+        <p class="strength-desc">
+          배터리·모터 탑재 구조, 중량 분배, 열 관리 등 전동지게차 전용 설계 과제를
+          VPD 방법론으로 해결하고, 무인 자율 산업차량·물류 자동화 솔루션 개발에도
+          가상 검증 기반을 제공합니다.
+        </p>
+      </div>
+
+      <div class="strength-card reveal reveal-delay-1">
+        <div class="strength-icon" aria-hidden="true">🔗</div>
+        <h3 class="strength-title">PLM 기반 데이터 일관성</h3>
+        <p class="strength-desc">
+          다쏘시스템 3DEXPERIENCE 플랫폼으로 설계·해석·생산 데이터를 하나의 플랫폼에서
+          관리하여, 글로벌 조직 간 실시간 협업과 부품 표준화를 실현합니다.
+          공통 부품 라이브러리와 참조자료 정보 시스템으로 개발 효율과 비용 절감을 동시에 달성합니다.
+        </p>
+      </div>
+
+      <div class="strength-card reveal reveal-delay-2">
+        <div class="strength-icon" aria-hidden="true">🏗️</div>
+        <h3 class="strength-title">생산 현장과의 실시간 연계</h3>
+        <p class="strength-desc">
+          DELMIA Apriso 제조운영관리(MOM)를 울산캠퍼스·군산공장 생산시설에 제공하여
+          설계 데이터와 생산 현장 사이의 정보 일관성을 확보하고, 사전 확인 후 생산 전송을 실현합니다.
+        </p>
+      </div>
+
+      <div class="strength-card reveal reveal-delay-3">
+        <div class="strength-icon" aria-hidden="true">🌐</div>
+        <h3 class="strength-title">글로벌 시장 대응 개발 체계</h3>
+        <p class="strength-desc">
+          인도 현지 R&D 거점 확대, 글로벌 제품 개발 관리(GPDM) 체계를 바탕으로
+          각국 산업 현장 요구에 맞춘 산업차량 개발을 가상 환경에서 빠르게 검증·조정할 수 있습니다.
+          2030년 산업차량 매출 1.6조 원 목표의 핵심 개발 인프라입니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- 통계 하이라이트 -->
+    <div class="strength-stats reveal">
+      <div class="strength-stat">
+        <div class="strength-stat-num" data-count="32">0%</div>
+        <div class="strength-stat-label">제품 완성 기간 단축률<br>(Ulsan Campus 선진화)</div>
+      </div>
+      <div class="strength-stat">
+        <div class="strength-stat-num" data-count="20">0%</div>
+        <div class="strength-stat-label">생산성 향상 전망<br>(선진화 프로젝트 효과)</div>
+      </div>
+      <div class="strength-stat">
+        <div class="strength-stat-num" data-count="24000">0</div>
+        <div class="strength-stat-label">연간 산업차량 생산 능력<br>(울산캠퍼스, 대)</div>
+      </div>
+      <div class="strength-stat">
+        <div class="strength-stat-num" data-count="1_6000">0</div>
+        <div class="strength-stat-label">2030년 산업차량 부문<br>매출 목표 (억 원)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" aria-hidden="true"></div>
+
+<!-- ============ SECTION 6 — 문의 (CTA) ============ -->
+<section class="cta" id="cta">
+  <div class="wrap">
+    <div class="cta-inner reveal">
+      <div class="cta-content">
+        <div>
+          <div class="cta-label">Contact · 문의</div>
+          <h2 class="cta-title">산업차량 VPD<br>가상제품개발에 대해<br>더 자세히 알고 싶으신가요?</h2>
+          <p class="cta-desc">
+            HD현대사이트솔루션 산업차량개발부문 VPD 파트의 업무 범위,
+            협업 방법, 기술 상담에 대해 문의해 주세요.
+          </p>
+        </div>
+        <div class="cta-actions">
+          <a href="mailto:contact@hd-xitesolution.com" class="btn btn-primary">
+            문의하기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="m3 8l9 6 9-6"/></svg>
+          </a>
+          <a href="#overview" class="btn btn-secondary" style="border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.8);">
+            위로 돌아가기
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="cta-contact-grid">
+          <div class="cta-contact-item">
+            <div class="cta-contact-label">소속</div>
+            <div class="cta-contact-value">HD현대사이트솔루션<br>산업차량개발부문 VPD</div>
+          </div>
+          <div class="cta-contact-item">
+            <div class="cta-contact-label">사업장</div>
+            <div class="cta-contact-value">울산캠퍼스 · 군산공장<br>경기도 성남 ( headquarters )</div>
+          </div>
+          <div class="cta-contact-item">
+            <div class="cta-contact-label">주요 플랫폼</div>
+            <div class="cta-contact-value">다쏘시스템<br>3DEXPERIENCE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <div class="footer-brand-mark" aria-hidden="true"></div>
+      <div class="footer-brand-text">
+        HD Hyundai XiteSolution
+        <small>Industrial Vehicle VPD · 가상제품개발</small>
+      </div>
+    </div>
+    <ul class="footer-link-list">
+      <li><a href="#overview">개요</a></li>
+      <li><a href="#vpd-concept">VPD란</a></li>
+      <li><a href="#major-tasks">주요업무</a></li>
+      <li><a href="#process">프로세스</a></li>
+      <li><a href="#strength">경쟁력</a></li>
+      <li><a href="#cta">문의</a></li>
+    </ul>
+    <div class="footer-copy">
+      © 2026 HD Hyundai XiteSolution. All rights reserved. · 본 페이지는 산업차량 VPD 파트 소개용 랜딩페이지입니다.
+    </div>
+  </div>
+</footer>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+(function () {
+  'use strict';
+
+  // ── 1. 프리로더 제거 ──────────────────────────────────────────
+  window.addEventListener('load', function () {
+    var preloader = document.getElementById('preloader');
+    if (preloader) {
+      setTimeout(function () {
+        preloader.classList.add('is-hidden');
+        // removed from flow after transition
+        setTimeout(function () { preloader.style.display = 'none'; }, 700);
+      }, 2200);
+    }
+  });
+
+  // ── 2. 네비게이션 스크롤 반응 ────────────────────────────────
+  var nav         = document.getElementById('nav');
+  var hamburger   = document.getElementById('hamburger');
+  var mobileMenu  = document.getElementById('mobileMenu');
+  var navLinks    = document.getElementById('navLinks');
+  var allNavAnchors = document.querySelectorAll('.nav-links a, .nav-mobile-menu a');
+
+  // 스크롤 시 navbar 어둡게
+  var lastScroll = 0;
+  window.addEventListener('scroll', function () {
+    var scrollY = window.scrollY || window.pageYOffset;
+    if (scrollY > 60) {
+      nav.classList.add('is-scrolled');
+    } else {
+      nav.classList.remove('is-scrolled');
+    }
+    lastScroll = scrollY;
+  }, { passive: true });
+
+  // 햄버거 토글
+  hamburger.addEventListener('click', function () {
+    var isOpen = hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+
+  // 모바일 메뉴 링크 클릭 → 메뉴 닫기
+  mobileMenu.querySelectorAll('a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ── 3. 활성 섹션 하이라이트 ──────────────────────────────────
+  var sectionIds = ['overview','vpd-concept','major-tasks','process','strength','cta'];
+  var sections   = sectionIds.map(function (id) {
+    return document.getElementById(id);
+  });
+
+  function updateActiveNav() {
+    var scrollPos = window.scrollY + 120 + nav.offsetHeight;
+    var current   = '';
+    for (var i = 0; i < sections.length; i++) {
+      if (!sections[i]) continue;
+      if (sections[i].offsetTop <= scrollPos) {
+        current = sectionIds[i];
+      }
+    }
+    allNavAnchors.forEach(function (a) {
+      var section = a.getAttribute('data-section') || a.getAttribute('href').replace('#','');
+      if (section === current) {
+        a.classList.add('active');
+      } else {
+        a.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  window.addEventListener('load', updateActiveNav);
+  // 초기 호출 (요소가 다 로드된 후)
+  setTimeout(updateActiveNav, 300);
+
+  // ── 4. 스크롤 리빌 애니메이션 (IntersectionObserver) ────────
+  var revealEls = document.querySelectorAll('.reveal');
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -40px 0px'
+    });
+
+    revealEls.forEach(function (el) { observer.observe(el); });
+  } else {
+    // 폴백: 모두 표시
+    revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  // ── 5. 카운트 업 애니메이션 ──────────────────────────────────
+  var counters = document.querySelectorAll('[data-count]');
+  var counted  = new Set();
+
+  function animateCount(el) {
+    if (counted.has(el)) return;
+    counted.add(el);
+
+    var raw    = el.getAttribute('data-count');
+    var target = raw.indexOf('_') > -1
+      ? parseInt(raw.replace('_',''))       // 1_6000 → 16000
+      : parseInt(raw, 10);
+    var suffix = (raw.indexOf('_') > -1 || raw.indexOf('1.6') > -1 || target >= 1000)
+      ? '' : '';
+    // 특수한 케이스 처리
+    var displayTarget;
+    var displaySuffix = '';
+    if (raw === '1_6000') {
+      displayTarget = 16000;
+      displaySuffix = '';
+    } else if (raw === '24000') {
+      displayTarget = 24000;
+      displaySuffix = '';
+    } else if (raw === '3') {
+      displayTarget = 3;
+    } else if (raw === '32') {
+      displayTarget = 32;
+      displaySuffix = '%';
+    } else if (raw === '20') {
+      displayTarget = 20;
+      displaySuffix = '%';
+    } else {
+      displayTarget = target;
+    }
+
+    var duration = 1600;
+    var startTime = null;
+
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      // easeOutCubic
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var currentVal = Math.round(displayTarget * eased);
+      el.textContent = currentVal + displaySuffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        el.textContent = displayTarget + displaySuffix;
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  var counterObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(function (c) { counterObserver.observe(c); });
+
+  // ── 6. 스무스 스크롤 (CSS scroll-behavior 보완용 JS) ────────
+  allNavAnchors.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var href = a.getAttribute('href');
+      if (!href || href.charAt(0) !== '#') return;
+      var target = document.querySelector(href);
+      if (!target) return;
+      e.preventDefault();
+      var top = target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight - 8;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+      // 해시 업데이트
+      history.replaceState(null, '', href);
+    });
+  });
+
+  // ── 7. 히어로 메트릭(첨부) 값 보정을 위한 재카운트 ──────────
+  // hero-metrics 내 데이터 카운트는 이미 카운트 옵저버 대상임
+})();
+</script>
+</body>
+</html>
